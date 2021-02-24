@@ -1,12 +1,12 @@
 const path = require("path");
 
-// Use the existing order data
+
 const orders = require(path.resolve("src/data/orders-data"));
 
-// Use this function to assigh ID's when necessary
+
 const nextId = require("../utils/nextId");
 
-// TODO: Implement the /orders handlers needed to make the tests pass
+
 
 function list(req, res, next) {
     res.json({ data: orders });
@@ -28,13 +28,13 @@ function isValidOrder(req, res, next) {
           message: "Order must include a mobileNumber",
         });
       }
-    if (!dishes) {   //good
+    if (!dishes) {   
       return next({
         status: 400,
         message: "Order must include a dish",
       });
     }
-    if (dishes.length < 1 || Array.isArray(dishes) === false) {   //how to make 'dish is missing a quantity' work?
+    if (dishes.length < 1 || Array.isArray(dishes) === false) {   
       return next({
         status: 400,
         message: "Order must include at least one dish",
@@ -48,7 +48,7 @@ function isValidOrder(req, res, next) {
             status: 400,
             message: `Dish ${i} must have a quantity that is an integer greater than 0`
         });
-      } // THIS TEST IS PROBLEMATIC; NEEDS QUANTITY > 0 & QUANTITY !INTEGER
+      } 
 
     }
 
@@ -73,13 +73,7 @@ function orderExists(req, res, next) {
     const orderId = req.params.orderId;
     const { data: { id, deliverTo, mobileNumber, status, dishes } = {} } = req.body;
   
-    // if (!orderId) {
-    //     //why does this not work?
-    //   return next({
-    //     status: 404,
-    //     message: `Order does not exist ${orderId}`,
-    //   });
-    // }
+    
     if (id) {
       if (orderId !== id) {
         return next({
@@ -101,7 +95,7 @@ function orderExists(req, res, next) {
 
 
 function create(req, res, next) {
-    //why does this not work?
+    
   const { data: {  deliverTo, mobileNumber, status, dishes } = {} } = req.body;
 
   const newOrder= {

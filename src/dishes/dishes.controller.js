@@ -1,16 +1,11 @@
-// const express = require("express");
-// const app = express();
-
 const path = require("path");
-// app.use(express.json());
 
-// Use the existing dishes data
 const dishes = require(path.resolve("src/data/dishes-data"));
 
-// Use this function to assign ID's when necessary
+
 const nextId = require("../utils/nextId");
 
-// TODO: Implement the /dishes handlers needed to make the tests pass
+
 function list(req, res, next) {
   res.json({ data: dishes });
 }
@@ -42,7 +37,7 @@ function isValidDish(req, res, next) {
       message: "Dish must include a image_url",
     });
   }
-  //code for is not a number, why no work?
+ 
   next();
 }
 
@@ -63,7 +58,7 @@ function dishIdValid(req, res, next) {
   const { data: { description, image_url, name, price, id } = {} } = req.body;
 
   if (!dishId) {
-      //why does this not work?
+     
     return next({
       status: 404,
       message: `Dish does not exist ${dishId}`,
@@ -82,7 +77,7 @@ function dishIdValid(req, res, next) {
 }
 
 function create(req, res, next) {
-    //why does this not work?
+  
   const { data: { description, image_url, name, price } = {} } = req.body;
 
   const newDish = {
