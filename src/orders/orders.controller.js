@@ -1,9 +1,5 @@
 const path = require("path");
-
-
 const orders = require(path.resolve("src/data/orders-data"));
-
-
 const nextId = require("../utils/nextId");
 
 
@@ -57,9 +53,8 @@ next();
 
 
 function orderExists(req, res, next) {
-    const orderId = req.params.orderId;
-    const foundOrder = orders.find((order) => order.id === orderId);
-    if (foundOrder) {
+    res.locals.foundOrder = orders.find((order) => order.id === orderId);
+    if (res.locals.foundOrder) {
       return next();
     } else {
       return next({
@@ -70,15 +65,13 @@ function orderExists(req, res, next) {
 
 
   function orderIdValid(req, res, next) {
-    const orderId = req.params.orderId;
-    const { data: { id, deliverTo, mobileNumber, status, dishes } = {} } = req.body;
+    const { data: { id, status } = {} } = req.body;
   
-    
     if (id) {
-      if (orderId !== id) {
+      if (req.params.orderId !== id) {
         return next({
           status: 400,
-          message: `Order id does not match route id. Order: ${id}, Route: ${orderId}`,
+          message: `Order id does not match route id. Order: ${id}, Route: ${req.params.orderId}`,
         });
       }
     }
@@ -94,11 +87,10 @@ function orderExists(req, res, next) {
   }
 
 
-function create(req, res, next) {
-    
+function create(req, res) {
   const { data: {  deliverTo, mobileNumber, status, dishes } = {} } = req.body;
 
-  const newOrder= {
+  const newOrder = {
     id: nextId(),
     deliverTo: deliverTo,
     mobileNumber: mobileNumber,
@@ -109,38 +101,32 @@ function create(req, res, next) {
   res.status(201).json({ data: newOrder});
 }
 
-function read(req, res, next) {
-  const orderId = req.params.orderId;
-  const foundOrder = orders.find((order) => order.id === orderId);
-  console.log(orderId, "orderId");
-  console.log(foundOrder, "foundOrder");
+function read(req, res) {
+  res.locals.foundOrder = orders.find((order) => order.id === req.params.orderId);
 
-  res.json({ data: foundOrder });
+  res.json({ data: res.locals.foundOrder });
 }
 
 function update(req, res, next) {
-  const orderId = req.params.orderId;
-  const foundOrder = orders.find((order) => order.id === orderId);
-  const originalResult = foundOrder;
+  res.locals.foundOrder = orders.find((order) => order.id === req.params.orderId);
 
-  const {data: {id, deliverTo, mobileNumber, status, dishes} = {} } = req.body
+  const {data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body
 
-  foundOrder.id = orderId
-  foundOrder.deliverTo = deliverTo
-  foundOrder.mobileNumber = mobileNumber
-  foundOrder.status = status
-  foundOrder.dishes = dishes
+  res.locals.foundOrder.id = req.params.orderId
+  res.locals.foundOrder.deliverTo = deliverTo
+  res.locals.foundOrder.mobileNumber = mobileNumber
+  res.locals.foundOrder.status = status
+  res.locals.foundOrder.dishes = dishes
 
-  res.json({ data: foundOrder });
+  res.json({ data: res.locals.foundOrder });
 }
 
 function destroy(req, res, next){
-    const orderId = req.params.orderId;
-    const foundOrder = orders.find((order) => order.id === orderId);
+    const foundOrder = orders.find((order) => order.id === req.params.orderId);
     if (!foundOrder) {
       return next({
         status: 404,
-        message: `Order ${orderId} does not exist.`
+        message: `Order ${req.params.orderId} does not exist.`
       });
     } else if (foundOrder.status !== "pending") {
       return next({
